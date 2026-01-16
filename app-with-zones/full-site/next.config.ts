@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  experimental: {
+    staleTimes: {
+      static: 60 * 60 * 24,
+      dynamic: 60,
+    },
+  },
   async rewrites() {
     return [
       {
