@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic'
 import InvestmentCardLayout from './investment-card-layout'
 import InvestmentHeader from './investment-header'
 import InvestmentRates from './investment-rates'
-
 import { InvestmentProps } from './types'
 import { investmentsData } from '@/data/global-data'
 
@@ -13,7 +12,7 @@ import Graphism from '@/assets/images/graphism-dark.svg'
 const InvestmentChart = dynamic(() => import('./investment-chart'), { ssr: false })
 
 const InvestmentCard = () => {
-  const { sectionTitle } = investmentsData as InvestmentProps
+  const { sectionTitle } = (investmentsData || {}) as InvestmentProps;
 
   return (
     <InvestmentCardLayout>

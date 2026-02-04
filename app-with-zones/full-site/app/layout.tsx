@@ -1,19 +1,12 @@
 import '@/styles/globals.css';
 
 import { Inter } from 'next/font/google';
-import dynamic from 'next/dynamic';
 import { twMerge } from 'tailwind-merge';
 
 import Header from '@/layouts/structure/header';
 import Footer from '@/layouts/structure/footer';
 import ReduxProvider from './redux-provider';
-
-const ToastContainerLazy = dynamic(
-  () => import('@/components/toast-container-lazy'),
-  { ssr: false }
-);
-
-const Modal = dynamic(() => import('@/components/modal'), { ssr: false });
+import LazyLayoutClient from './lazy-layout-client';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -32,8 +25,7 @@ export default function RootLayout({
           <Header />
           <main className="min-h-screen">{children}</main>
           <Footer />
-          <Modal />
-          <ToastContainerLazy />
+          <LazyLayoutClient />
         </ReduxProvider>
       </body>
     </html>
