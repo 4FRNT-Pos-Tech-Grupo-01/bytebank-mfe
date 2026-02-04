@@ -1,5 +1,7 @@
 const { Router } = require('express')
 const UserController = require('./controller/User')
+const validateRequest = require('./middleware/validateRequest')
+const { LoginSchema, RegisterSchema } = require('./schemas')
 
 const userController = new UserController({})
 const router = Router()
@@ -56,7 +58,7 @@ router.get('/user', userController.find.bind(userController))
  *       400:
  *         description: Dados inválidos
  */
-router.post('/user', userController.create.bind(userController))
+router.post('/user', validateRequest(RegisterSchema), userController.create.bind(userController))
 
 /**
  * @swagger
@@ -88,6 +90,6 @@ router.post('/user', userController.create.bind(userController))
  *       401:
  *         description: Credenciais inválidas
  */
-router.post('/user/auth', userController.auth.bind(userController))
+router.post('/user/auth', validateRequest(LoginSchema), userController.auth.bind(userController))
 
 module.exports = router

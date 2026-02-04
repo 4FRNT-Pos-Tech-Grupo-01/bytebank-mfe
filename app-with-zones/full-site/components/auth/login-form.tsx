@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AuthLayout } from './auth-layout';
 import IlustracaoLogin from '@/assets/images/ilustracaoLogin.svg';
 import Button from '../button';
@@ -12,28 +13,34 @@ import { AppDispatch } from '@/store';
 import { setIsLoggedIn } from '@/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import { setUserAuthenticated } from '@/features/user/userSlice';
+import { LoginSchema } from '@/lib/schemas';
+import { toast } from 'react-toastify';
 
 export function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(LoginSchema),
+  });
 
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
+  async function onSubmit(data: { email: string; password: string }) {
     try {
-      const response = await login({ email, password });
+      const response = await login(data);
 
       if (response.result.token) {
         dispatch(setIsAuthModalOpen(false));
         dispatch(setIsLoggedIn(true));
-        dispatch(setUserAuthenticated(email));
+        dispatch(setUserAuthenticated(data.email));
 
         router.push('/dashboard');
       }
     } catch (err: unknown) {
+      toast.error('Email ou senha inválidos');
       console.log('Email ou senha inválidos', err);
     }
   }
@@ -46,15 +53,15 @@ export function LoginForm() {
       illustrationHeight={267}
       title="Login"
     >
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <Input
           label="Email"
           type="email"
           id="login-email"
           autoComplete="email"
           placeholder="Digite seu email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          error={errors.email?.message}
+          {...register('email')}
         />
         <Input
           label="Senha"
@@ -62,8 +69,8 @@ export function LoginForm() {
           id="login-password"
           autoComplete="current-password"
           placeholder="Digite sua senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          error={errors.password?.message}
+          {...register('password')}
         />
         <div className="text-left mb-2">
           <Button

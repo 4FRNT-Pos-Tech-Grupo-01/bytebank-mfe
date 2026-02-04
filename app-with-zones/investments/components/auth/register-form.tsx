@@ -1,42 +1,32 @@
 'use client'
 
-import { useState } from "react"
-import { AuthLayout } from "./auth-layout"
-import IlustracaoCriacaoLogin from "@/assets/images/IlustraçãoCriacaoLogin.svg"
-import Button from "../button"
-import Input from "../input"
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AuthLayout } from './auth-layout';
+import IlustracaoCriacaoLogin from '@/assets/images/IlustraçãoCriacaoLogin.svg';
+import Button from '../button';
+import Input from '../input';
+import { RegisterSchema } from '@/lib/schemas';
 
 interface RegisterFormProps {
-  onSubmit: (data: { name: string; email: string; password: string }) => void
-  formId?: string
+  onSubmit: (data: { name: string; email: string; password: string }) => void;
+  formId?: string;
 }
 
 export function RegisterForm({ onSubmit, formId }: RegisterFormProps) {
-  const uniqueId = formId || `register-form-${Math.random().toString(36).slice(2, 10)}`
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [agreedToTerms, setAgreedToTerms] = useState(false)
-  const [emailError, setEmailError] = useState("")
+  const uniqueId =
+    formId || `register-form-${Math.random().toString(36).slice(2, 10)}`;
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      setEmailError("Dado incorreto, Revise e digite novamente.")
-      return false
-    } else {
-      setEmailError("")
-      return true
-    }
-  }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm({
+    resolver: zodResolver(RegisterSchema),
+  });
 
-  const handleSubmit = () => {
-    if (name && email && password && agreedToTerms) {
-      onSubmit({ name, email, password })
-    } else if (!agreedToTerms) {
-      alert("Você deve concordar com os termos para continuar.")
-    }
-  }
+  const agreedToTerms = watch('agreedToTerms');
 
   return (
     <AuthLayout
@@ -47,14 +37,14 @@ export function RegisterForm({ onSubmit, formId }: RegisterFormProps) {
       title="Criar conta"
       subtitle="Preencha os campos abaixo para criar sua conta corrente!"
     >
-      <div className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <Input
           label="Nome completo"
           id={`${uniqueId}-name`}
           autoComplete="name"
           placeholder="Digite seu nome completo"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          error={errors.name?.message}
+          {...register('name')}
         />
         <Input
           label="Email"
@@ -62,12 +52,8 @@ export function RegisterForm({ onSubmit, formId }: RegisterFormProps) {
           type="email"
           autoComplete="email"
           placeholder="Digite seu email"
-          value={email}
-          error={emailError}
-          onChange={(e) => {
-            setEmail(e.target.value)
-            validateEmail(e.target.value)
-          }}
+          error={errors.email?.message}
+          {...register('email')}
         />
         <Input
           label="Senha"
@@ -75,18 +61,25 @@ export function RegisterForm({ onSubmit, formId }: RegisterFormProps) {
           type="password"
           autoComplete="new-password"
           placeholder="Digite sua senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          error={errors.password?.message}
+          {...register('password')}
+        />
+        <Input
+          label="Confirmar Senha"
+          id={`${uniqueId}-confirmPassword`}
+          type="password"
+          autoComplete="new-password"
+          placeholder="Confirme sua senha"
+          error={errors.confirmPassword?.message}
+          {...register('confirmPassword')}
         />
         <div className="flex items-start gap-3 my-2">
           <input
             type="checkbox"
             id={`${uniqueId}-terms`}
-            checked={agreedToTerms}
-            onChange={(e) => setAgreedToTerms(e.target.checked)}
             className="mt-1 w-4 h-4 accent-[var(--color-green)] border-[var(--color-green)] border-2 rounded focus:ring-green-500"
             aria-describedby={`${uniqueId}-terms-description`}
-            required
+            {...register('agreedToTerms')}
           />
           <label
             htmlFor={`${uniqueId}-terms`}
@@ -97,14 +90,21 @@ export function RegisterForm({ onSubmit, formId }: RegisterFormProps) {
             conforme descrito na Política de Privacidade do banco.
           </label>
         </div>
+        {errors.agreedToTerms && (
+          <p className="text-red-500 text-sm">{errors.agreedToTerms.message}</p>
+        )}
         <Button
           label="Criar conta"
-          onClick={handleSubmit}
+          type="submit"
           disabled={!agreedToTerms}
           centered
-          aria-label={agreedToTerms ? "Criar nova conta" : "Aceite os termos para criar conta"}
+          aria-label={
+            agreedToTerms
+              ? 'Criar nova conta'
+              : 'Aceite os termos para criar conta'
+          }
         />
-      </div>
+      </form>
     </AuthLayout>
-  )
+  );
 }
