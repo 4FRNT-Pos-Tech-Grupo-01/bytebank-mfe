@@ -50,10 +50,10 @@ export const TransactionSchema = z.object({
   amount: z
     .string()
     .min(1, 'Valor é obrigatório')
-    .pipe(z.coerce.number().positive('Valor deve ser maior que 0')),
-  type: z.enum(['Credit', 'Debit'], {
-    errorMap: () => ({ message: 'Tipo de transação inválido' }),
-  }),
+    .transform((val) => parseFloat(val))
+    .refine((val) => !isNaN(val), 'Valor deve ser um número válido')
+    .refine((val) => val > 0, 'Valor deve ser maior que 0'),
+  type: z.enum(['Credit', 'Debit'], { message: 'Tipo de transação inválido' }),
   date: z
     .string()
     .min(1, 'Data é obrigatória')
@@ -81,7 +81,9 @@ export const TransferSchema = z.object({
   amount: z
     .string()
     .min(1, 'Valor é obrigatório')
-    .pipe(z.coerce.number().positive('Valor deve ser maior que 0')),
+    .transform((val) => parseFloat(val))
+    .refine((val) => !isNaN(val), 'Valor deve ser um número válido')
+    .refine((val) => val > 0, 'Valor deve ser maior que 0'),
   description: z
     .string()
     .optional(),
