@@ -97,6 +97,20 @@ The frontend applications are built with **Next.js 15** and follow a modular, co
   - `utilities.css` - Custom utility classes
   - Component-scoped styling where appropriate
 
+#### Performance & Lazy loading
+
+Optimizations applied to reduce the initial bundle size and improve First Load:
+
+- **Modal and auth** – The `Modal` component (and login/register forms) is loaded with `next/dynamic` and `ssr: false`, so auth code is not included in the first-page bundle.
+- **Toast** – `ToastContainer` and react-toastify CSS are loaded in a separate chunk via `components/toast-container-lazy.tsx`, only after hydration.
+- **Recharts (investments)** – The investments chart (`InvestmentChart` / PieChart) is dynamically imported; the Recharts library is only downloaded when the user visits the investments page.
+
+**Additional tips:**
+
+- **Images** – For PNG/JPEG, use `next/image` with `loading="lazy"` (default) and `sizes` for better LCP and less data.
+- **Routes** – Next.js App Router already code-splits by route; each `page.tsx` becomes a separate chunk.
+- **Below-the-fold** – Heavy components further down the page can be wrapped in `dynamic(..., { ssr: false })` and optionally in `<Suspense>` with a fallback (e.g. skeleton).
+
 ### Folders structure
 
 ````
