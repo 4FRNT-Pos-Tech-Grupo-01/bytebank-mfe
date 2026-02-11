@@ -3,12 +3,10 @@ import '@/styles/globals.css';
 import { Inter } from 'next/font/google';
 import { twMerge } from 'tailwind-merge';
 
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Header from '@/layouts/structure/header';
 import Footer from '@/layouts/structure/footer';
-import Modal from '@/components/modal';
 import ReduxProvider from './redux-provider';
+import LazyLayoutClient from './lazy-layout-client';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -27,8 +25,7 @@ export default function RootLayout({
           <Header />
           <main className="min-h-screen">{children}</main>
           <Footer />
-          <Modal />
-          <ToastContainer position="top-right" autoClose={3000} />
+          <LazyLayoutClient />
         </ReduxProvider>
       </body>
     </html>
