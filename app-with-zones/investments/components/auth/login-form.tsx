@@ -1,22 +1,24 @@
-import { useState } from "react"
-import { AuthLayout } from "./auth-layout"
-import IlustracaoLogin from "@/assets/images/ilustracaoLogin.svg"
-import Button from "../button"
-import Input from "../input"
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AuthLayout } from './auth-layout';
+import IlustracaoLogin from '@/assets/images/ilustracaoLogin.svg';
+import Button from '../button';
+import Input from '../input';
+import { LoginSchema } from '@/lib/schemas';
 
 interface LoginFormProps {
-  onSubmit: (data: { email: string; password: string }) => void
+  onSubmit: (data: { email: string; password: string }) => void;
 }
 
 export function LoginForm({ onSubmit }: LoginFormProps) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-
-  const handleSubmit = () => {
-    if (email && password) {
-      onSubmit({ email, password })
-    }
-  }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm({
+    resolver: zodResolver(LoginSchema),
+    mode: 'onChange',
+  });
 
   return (
     <AuthLayout
@@ -26,15 +28,15 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
       illustrationHeight={267}
       title="Login"
     >
-      <div className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <Input
           label="Email"
           type="email"
           id="login-email"
           autoComplete="email"
           placeholder="Digite seu email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          error={errors.email?.message}
+          {...register('email')}
         />
         <Input
           label="Senha"
@@ -42,8 +44,8 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
           id="login-password"
           autoComplete="current-password"
           placeholder="Digite sua senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          error={errors.password?.message}
+          {...register('password')}
         />
         <div className="text-left mb-2">
           <Button
@@ -54,11 +56,12 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
         </div>
         <Button
           label="Acessar"
-          onClick={handleSubmit}
+          type="submit"
           centered
           aria-label="Fazer login na conta"
+          disabled={!isValid}
         />
-      </div>
+      </form>
     </AuthLayout>
-  )
+  );
 }
