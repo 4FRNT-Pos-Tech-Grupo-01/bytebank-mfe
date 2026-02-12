@@ -25,10 +25,11 @@ export function RegisterForm({ formId }: RegisterFormProps) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     watch,
   } = useForm({
     resolver: zodResolver(RegisterSchema),
+    mode: 'onChange',
   });
 
   const agreedToTerms = watch('agreedToTerms');
@@ -126,7 +127,7 @@ export function RegisterForm({ formId }: RegisterFormProps) {
         <Button
           label="Criar conta"
           type="submit"
-          disabled={!agreedToTerms}
+          disabled={!agreedToTerms || !isValid}
           centered
           aria-label={
             agreedToTerms

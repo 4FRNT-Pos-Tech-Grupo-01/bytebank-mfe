@@ -14,9 +14,10 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(LoginSchema),
+    mode: 'onChange',
   });
 
   return (
@@ -58,6 +59,7 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
           type="submit"
           centered
           aria-label="Fazer login na conta"
+          disabled={!isValid}
         />
       </form>
     </AuthLayout>

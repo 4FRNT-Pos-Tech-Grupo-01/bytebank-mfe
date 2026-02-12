@@ -20,9 +20,10 @@ export function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(LoginSchema),
+    mode: 'onChange',
   });
 
   const dispatch = useDispatch<AppDispatch>();
@@ -84,6 +85,7 @@ export function LoginForm() {
           centered
           aria-label="Fazer login na conta"
           type="submit"
+          disabled={!isValid}
         />
       </form>
     </AuthLayout>
